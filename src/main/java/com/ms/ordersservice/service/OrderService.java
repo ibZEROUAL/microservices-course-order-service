@@ -1,6 +1,7 @@
 package com.ms.ordersservice.service;
 
 import com.ms.ordersservice.dto.OrderDto;
+import com.ms.ordersservice.mapper.OrderLineItemsMapper;
 import com.ms.ordersservice.mapper.OrderMapper;
 import com.ms.ordersservice.model.Order;
 import com.ms.ordersservice.repository.OrderRepository;
@@ -18,16 +19,33 @@ public class OrderService {
 
     private final OrderMapper orderMapper;
 
+    private final OrderLineItemsService orderLineItemsService;
+
+    private final OrderLineItemsMapper orderLineItemsMapper;
+
     public void placeOrder(OrderDto orderDto){
 
         Order order = orderMapper.orderDtoToOrder(orderDto);
-        order.setOrderNumber(UUID.randomUUID().toString());
+        order.setOrderLineItems(orderLineItemsMapper.orderLineItemsDtoListToOrderLineItemsList(orderDto.getOrderLineItemsDtos()));
+
+        order.getOrderLineItems().forEach(orderLineItems -> {
+            orderLineItemsService.saveOrderLineItem(orderLineItems);
+            orderLineItems.setOrder(order);
+        });
+
+        order.setOrderNumber("order".concat(UUID.randomUUID().toString()));
 
         orderRepository.save(order);
     }
-
     public List<OrderDto> getOrders(){
-        return orderMapper.orderListToOrderDtoList(orderRepository.findAll());
+
+       return orderRepository.findAll().parallelStream()
+                .map(order -> {
+                   var orderLineItemsListDtos = orderLineItemsService.getOrderLineItemsByOrderNumber(order.getId());
+                   var orderDto = orderMapper.orderToOrderDto(order);
+                   orderDto.setOrderLineItemsDtos(orderLineItemsListDtos);
+                   return orderDto;
+                }).toList();
     }
 
 }

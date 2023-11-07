@@ -1,9 +1,7 @@
 package com.ms.ordersservice.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -14,6 +12,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Order {
 
     @Id
@@ -24,5 +23,7 @@ public class Order {
     private String orderNumber;
 
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    @ToString.Exclude
     private List<OrderLineItems> orderLineItems;
 }

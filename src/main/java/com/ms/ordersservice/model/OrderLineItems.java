@@ -2,6 +2,7 @@ package com.ms.ordersservice.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 @Setter
 @Entity
 @Table(name = "t_order_line_items")
+@ToString
 public class OrderLineItems {
 
     @Id
