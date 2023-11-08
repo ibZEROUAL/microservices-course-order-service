@@ -23,13 +23,8 @@ public class OrderLineItemsService {
     }
 
 
-    public List<OrderLineItemsDto> getOrderLineItemsByOrderNumber(Long orderNumber){
-
-        var orderLineItemsList =  orderLineItemsRepository.findAll().parallelStream()
-                .filter(orderLineItems -> orderLineItems.getOrder().getId().equals(orderNumber))
-                .toList();
-
-        return orderLineItemsMapper.orderLineItemsListToOrderLineItemsDtoList(orderLineItemsList);
+    public List<OrderLineItemsDto> getOrderLineItemsByOrderNumber(Long orderId){
+        return orderLineItemsMapper.orderLineItemsListToOrderLineItemsDtoList(orderLineItemsRepository.getOrderLineItemsByOrderId(orderId));
     }
 
 }
